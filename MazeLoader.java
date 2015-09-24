@@ -207,9 +207,9 @@ public class MazeLoader {
 	{
 		
 		
-		for(int i = 0; i<width;i++)
+		for(int i = 0; i<height;i++)
 		{
-			for(int j = 0; j<height;j++)
+			for(int j = 0; j<width;j++)
 			{
 				if(mazeContext[i][j] == '.')
 				{
@@ -560,7 +560,8 @@ public class MazeLoader {
 		int numberOfSteps = 0;
 		int nodeExpanded = 0;
 		//System.out.println(Height);
-		
+	//	System.out.println("endNode: "+endNode.getX()+ "   "+endNode.getY()+ "    width: "+Width+"    height: "+Height);
+		//Thread.sleep(100);
 		//Open state
 		PriorityQueue<Node> mazeLocaQue = new PriorityQueue<Node>();
 		
@@ -574,6 +575,8 @@ public class MazeLoader {
 		{
 		
 			Node currentNode = mazeLocaQue.poll();
+	//		System.out.println(currentNode.getH());
+		//	Thread.sleep(500);
 			isChecked.add(currentNode.getX()+"/"+currentNode.getY());
 			numberOfSteps++;
 			if(mazeContext[currentNode.getX()][currentNode.getY()] == '.')
@@ -589,12 +592,29 @@ public class MazeLoader {
 				for(int i = 0;i<8;i++ )//not finished.  > starting counter
 				{
 					numberOfSteps++;
-					if(mazeContext[currentNode.getX()+xM[i]][currentNode.getY()+yM[i]] == ' ' ||mazeContext[currentNode.getX()+xM[i]][currentNode.getY()+yM[i]] == '.' && currentNode.getX()+xM[i]>0 && currentNode.getY()+yM[i]>0 && currentNode.getX()+xM[i]<Width-1 && currentNode.getY()+yM[i]<Height-1)
+			//		System.out.println("Entered loop!!!!!");
+					int newX = currentNode.getX()+xM[i];
+					int newY = currentNode.getY()+yM[i];
+					//System.out.println("dx   "+xM[i]+"   dy  "+yM[i]+"   Current X   "+currentNode.getX()+  "currentY  "+currentNode.getY());
+					//System.out.println("CurrentPosition: "+newX+"   "+newY);
+					//System.out.println("The Value: "+ mazeContext[currentNode.getX()+xM[i]][currentNode.getY()+yM[i]]);
+					if(mazeContext[newX][newY] == '.')
 					{
-					
+						numberOfSteps++;
+						System.out.println("Total steps: "+numberOfSteps+"    Total Node Expanded: "+nodeExpanded);
+						return 1;
+					}
+				//	Thread.sleep(200);
+					if(mazeContext[newX][newY] == ' ' ||mazeContext[newX][newY] == '.' && newX>0 && newY>0 && newX<Width-1 && newY<Height-1)
+					{
+			//			System.out.println("right track");
+				//		System.out.println("dx   "+xM[i]+"   dy  "+yM[i]+"   Current X   "+currentNode.getX()+  "currentY  "+currentNode.getY());
+			
+						
 				//current_action = applicable action
 				//successor state= currentstate apply
-						Node expandedNode = new Node(currentNode.getX()+xM[i],currentNode.getY()+yM[i]);
+						
+						Node expandedNode = new Node(newX,newY);
 						numberOfSteps++;
 						nodeExpanded++;
 						if(mazeContext[expandedNode.getX()][expandedNode.getY()] == '.')

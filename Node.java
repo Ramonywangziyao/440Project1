@@ -4,6 +4,12 @@ public class Node implements Comparable<Node> {
 	private int nodeY;
 	Node lastNode;
 	private int heu;
+	public Node(int xX,int yY)
+	{
+		nodeX = xX;
+		nodeY = yY;
+	}
+	
 	public int getX()
 	{
 		return nodeX;

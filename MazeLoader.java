@@ -39,7 +39,7 @@ public class MazeLoader {
 	}
 	*/
 	//run the maze
-	public static void main(String [] args) throws IOException
+	public static void main(String [] args) throws IOException, InterruptedException
 	{
 		String fileName;
 		Scanner scanner = new Scanner(System.in);
@@ -82,13 +82,18 @@ public class MazeLoader {
 		}
 		
 		int [] startPacman = searchForPacman(maze,size,count);
+		int [] goalofPacman = searchForGoal(maze,size,count);
 		Node startNode = new Node();
+		Node endNode = new Node();
 		System.out.println(startPacman[0]+" "+startPacman[1]);
 		startNode.setX(startPacman[0]);
 		startNode.setY(startPacman[1]);
+		endNode.setX(goalofPacman[0]);
+		endNode.setY(goalofPacman[1]);
 		System.out.println("AlgoCount: "+count);
 	//	int result = depthFirst(maze,size,count,startNode.getX(),startNode.getY());
-		int result = breadth(maze,startNode,size,count);
+		//int result = breadth(maze,startNode,size,count);
+		int result = greedyBest(maze,startNode,endNode,size,count);
 		System.out.println("\n"+result);
 		for(int i =0;i<count;i++)
 		{
@@ -134,25 +139,26 @@ public class MazeLoader {
 		
 	}
 	
-	public int[] searchForGoal(char[][]mazeContext, int width, int height)
+	public static int[] searchForGoal(char[][]mazeContext, int width, int height)
 	{
 		
-		int[] goalPosition = null;
+		
 		for(int i = 0; i<width;i++)
 		{
 			for(int j = 0; j<height;j++)
 			{
 				if(mazeContext[i][j] == '.')
 				{
+					int[] goalPosition = new int[2];
 					goalPosition[0] = i;
 					goalPosition[1] = j;
-					break;
+					return goalPosition;
 				}
 			}
 		}
 		
 		
-		return goalPosition;
+		return null;
 		
 	}
 	
@@ -212,16 +218,16 @@ public class MazeLoader {
 		
 	}
 	
-	public static int breadth(char[][]mazeContext, Node newNode, int Height, int Width)
+	public static int breadth(char[][]mazeContext, Node newNode, int Height, int Width) throws InterruptedException
 	{
 		//baseCase
 		int numberOfSteps = 0;
 		int nodeExpanded = 0;
 		//System.out.println(Height);
 		Queue<Node> mazeLocaQue = new LinkedList<Node>();
-		List<Node> isChecked = new ArrayList<Node>();
+		List<String> isChecked = new ArrayList<String>();
 		mazeLocaQue.add(newNode);
-		isChecked.add(newNode);
+		isChecked.add(newNode.getX()+"/"+newNode.getY());
 		//add starting node
 		//traverse the surrounding nodes
 		//System.out.println("start POINT: "+newNode.getX()+" "+newNode.getY());
@@ -247,7 +253,7 @@ public class MazeLoader {
 				theNewNode.setX(currentX);
 				theNewNode.setY(currentY+1);
 				
-				if(isChecked.indexOf(theNewNode)<0 && mazeContext[currentX][currentY+1] == ' '||mazeContext[currentX][currentY+1] == '.')
+				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX][currentY+1] == ' '||mazeContext[currentX][currentY+1] == '.')
 				{
 					numberOfSteps++;
 					nodeExpanded++;
@@ -259,8 +265,8 @@ public class MazeLoader {
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
-					isChecked.add(theNewNode);
-					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'J';
+					isChecked.add(theNewNode.getX()+"/"+theNewNode.getY());
+					mazeContext[theNewNode.getX()][theNewNode.getY()] = ',';
 					
 					
 				}
@@ -274,7 +280,7 @@ public class MazeLoader {
 				
 				theNewNode.setX(currentX-1);
 				theNewNode.setY(currentY+1);
-				if(isChecked.indexOf(theNewNode)<0 && mazeContext[currentX-1][currentY+1] == ' '||mazeContext[currentX-1][currentY+1] == '.')
+				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX-1][currentY+1] == ' '||mazeContext[currentX-1][currentY+1] == '.')
 				{
 					nodeExpanded++;
 					numberOfSteps++;
@@ -286,8 +292,8 @@ public class MazeLoader {
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
-					isChecked.add(theNewNode);
-					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'J';
+					isChecked.add(theNewNode.getX()+"/"+theNewNode.getY());
+					mazeContext[theNewNode.getX()][theNewNode.getY()] = ',';
 				}
 			}
 			if(currentX-1>0 && currentY>0 && currentX-1<Width-1 && currentY<Height-1)
@@ -300,7 +306,7 @@ public class MazeLoader {
 				theNewNode.setY(currentY);
 				theNewNode.lastNode = currentNode;
 			//	System.out.println("the NEW node X: "+theNewNode.getX()+" newY: "+theNewNode.getY());
-				if(isChecked.indexOf(theNewNode)<0 && mazeContext[currentX-1][currentY] == ' ' || mazeContext[currentX-1][currentY]== '.')
+				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX-1][currentY] == ' ' || mazeContext[currentX-1][currentY]== '.')
 				{
 					numberOfSteps++;
 					nodeExpanded++;
@@ -312,8 +318,8 @@ public class MazeLoader {
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
-					isChecked.add(theNewNode);
-					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'J';
+					isChecked.add(theNewNode.getX()+"/"+theNewNode.getY());
+					mazeContext[theNewNode.getX()][theNewNode.getY()] = ',';
 				}
 			}
 			if(currentX-1>0 && currentY-1>0 && currentX-1<Width-1 && currentY-1<Height-1)
@@ -324,7 +330,7 @@ public class MazeLoader {
 				
 				theNewNode.setX(currentX-1);
 				theNewNode.setY(currentY-1);
-				if(isChecked.indexOf(theNewNode)<0 && mazeContext[currentX-1][currentY-1] == ' '||mazeContext[currentX-1][currentY-1]== '.')
+				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX-1][currentY-1] == ' '||mazeContext[currentX-1][currentY-1]== '.')
 				{
 					nodeExpanded++;
 					numberOfSteps++;
@@ -336,8 +342,8 @@ public class MazeLoader {
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
-					isChecked.add(theNewNode);
-					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'J';
+					isChecked.add(theNewNode.getX()+"/"+theNewNode.getY());
+					mazeContext[theNewNode.getX()][theNewNode.getY()] = ',';
 				}
 			}
 			if(currentX>0 && currentY-1>0 && currentX<Width-1 && currentY-1<Height-1)
@@ -350,7 +356,7 @@ public class MazeLoader {
 				theNewNode.setY(currentY-1);
 			//	System.out.println("the NEW node X: "+theNewNode.getX()+" newY: "+theNewNode.getY());
 			
-				if(isChecked.indexOf(theNewNode)<0 && mazeContext[currentX][currentY-1] == ' '||mazeContext[currentX][currentY-1]== '.')
+				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX][currentY-1] == ' '||mazeContext[currentX][currentY-1]== '.')
 				{
 				//	System.out.println("RightTrack!");
 					numberOfSteps++;
@@ -363,8 +369,8 @@ public class MazeLoader {
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
-					isChecked.add(theNewNode);
-					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'J';
+					isChecked.add(theNewNode.getX()+"/"+theNewNode.getY());
+					mazeContext[theNewNode.getX()][theNewNode.getY()] = ',';
 				}
 			}
 			if(currentX+1>0 && currentY-1>0 && currentX+1<Width-1 && currentY-1<Height-1)
@@ -374,7 +380,7 @@ public class MazeLoader {
 				numberOfSteps++;
 				theNewNode.setX(currentX+1);
 				theNewNode.setY(currentY-1);
-				if(isChecked.indexOf(theNewNode)<0 && mazeContext[currentX+1][currentY-1] == ' ' || mazeContext[currentX+1][currentY-1]== '.')
+				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX+1][currentY-1] == ' ' || mazeContext[currentX+1][currentY-1]== '.')
 				{
 					numberOfSteps++;
 					nodeExpanded++;
@@ -386,8 +392,8 @@ public class MazeLoader {
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
-					isChecked.add(theNewNode);
-					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'J';
+					isChecked.add(theNewNode.getX()+"/"+theNewNode.getY());
+					mazeContext[theNewNode.getX()][theNewNode.getY()] = ',';
 				}
 				
 			}
@@ -399,7 +405,7 @@ public class MazeLoader {
 				
 				theNewNode.setX(currentX+1);
 				theNewNode.setY(currentY);
-				if(isChecked.indexOf(theNewNode)<0 && mazeContext[currentX+1][currentY] == ' '||mazeContext[currentX+1][currentY]== '.')
+				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX+1][currentY] == ' '||mazeContext[currentX+1][currentY]== '.')
 				{
 					numberOfSteps++;
 					nodeExpanded++;
@@ -411,8 +417,8 @@ public class MazeLoader {
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
-					isChecked.add(theNewNode);
-					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'J';
+					isChecked.add(theNewNode.getX()+"/"+theNewNode.getY());
+					mazeContext[theNewNode.getX()][theNewNode.getY()] = ',';
 				}
 			}
 			if(currentX+1>0 && currentY+1>0 && currentX+1<Width-1 && currentY+1<Height-1)
@@ -423,7 +429,7 @@ public class MazeLoader {
 				
 				theNewNode.setX(currentX+1);
 				theNewNode.setY(currentY+1);
-				if(isChecked.indexOf(theNewNode)<0 && mazeContext[currentX+1][currentY+1] == ' '||mazeContext[currentX+1][currentY+1]== '.')
+				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX+1][currentY+1] == ' '||mazeContext[currentX+1][currentY+1]== '.')
 				{
 					nodeExpanded++;
 					numberOfSteps++;
@@ -435,10 +441,19 @@ public class MazeLoader {
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
-					isChecked.add(theNewNode);
-					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'J';
+					isChecked.add(theNewNode.getX()+"/"+theNewNode.getY());
+					mazeContext[theNewNode.getX()][theNewNode.getY()] = ',';
 				}
 			}
+			for(int k =0;k<Width;k++)
+			{
+				for(int j = 0;j<Height;j++)
+				{
+					System.out.print(mazeContext[k][j]);
+				}
+				System.out.println();
+			}
+			Thread.sleep(100);
 
 		}
 		
@@ -446,56 +461,81 @@ public class MazeLoader {
 		return 0;
 	}
 	
-	public int greedyBest(char[][]mazeContext, Node newNode,Node endNode, int Width, int Height)
+	public static int greedyBest(char[][]mazeContext, Node newNode,Node endNode, int Width, int Height) throws InterruptedException
 	{
 		int numberOfSteps = 0;
 		int nodeExpanded = 0;
 		//System.out.println(Height);
-		Queue<Node> mazeLocaQue = new LinkedList<Node>();
-		List<Node> isChecked = new ArrayList<Node>();
+		
+		//Open state
+		PriorityQueue<Node> mazeLocaQue = new PriorityQueue<Node>();
+		
+		//checked state
+		List<String> isChecked = new ArrayList<String>();
 		mazeLocaQue.add(newNode);
-		isChecked.add(newNode);
+		int [] xM = {0,0,-1,-1,-1,1,1,1};
+		int [] yM = {-1,1,-1,0,1,-1,0,1};
+		
 		while(!mazeLocaQue.isEmpty())
 		{
+		
 			Node currentNode = mazeLocaQue.poll();
-			Node goalNode = endNode;
-			int h = calcuManhattonDistance(endNode.getX(),currentNode.getX(),endNode.getY(),currentNode.getY());
+			isChecked.add(currentNode.getX()+"/"+currentNode.getY());
+			
+			if(mazeContext[currentNode.getX()][currentNode.getY()] == '.')
+			{
+				return 1;
+			}else
+			{
+	
+			//int h = calcuManhattonDistance(endNode.getX(),currentNode.getX(),endNode.getY(),currentNode.getY());
 			//starting counter
 			//applicable actions
-			for(int i = 0; )//not finished.  > starting counter
-			{
+				for(int i = 0;i<8;i++ )//not finished.  > starting counter
+				{
+				
+					if(mazeContext[currentNode.getX()+xM[i]][currentNode.getY()+yM[i]] == ' ' ||mazeContext[currentNode.getX()+xM[i]][currentNode.getY()+yM[i]] == '.' && currentNode.getX()+xM[i]>0 && currentNode.getY()+yM[i]>0 && currentNode.getX()+xM[i]<Width-1 && currentNode.getY()+yM[i]<Height-1)
+					{
+					
 				//current_action = applicable action
 				//successor state= currentstate apply
-				Node expandedNode = new Node();
-				
-				if(expandedNode.getX()==endNode.getX() && expandedNode.getY()==endNode.getY())
-				{
-					return 1;
-				}
+						Node expandedNode = new Node();
+						expandedNode.setX(currentNode.getX()+xM[i]);
+						expandedNode.setY(currentNode.getY()+yM[i]);
+						if(mazeContext[expandedNode.getX()][expandedNode.getY()] == '.')
+						{
+							return 1;
+						}
 				//end if
-				if()//successor h = h of sucor state
-				{
-					return 0; //end
+						expandedNode.setH(calcuManhattonDistance(endNode.getX(),expandedNode.getX(),endNode.getY(),expandedNode.getY()));
+						
+						if(isChecked.indexOf(expandedNode.getX()+"/"+expandedNode.getY())<0)
+						{
+						
+							expandedNode.lastNode = currentNode;
+							mazeLocaQue.add(expandedNode);//insert current state
+							isChecked.add(expandedNode.getX()+"/"+expandedNode.getY());//insert successor state
+							mazeContext[expandedNode.getX()][expandedNode.getY()] = ',';
+							
+						}
+						for(int k =0;k<Height;k++)
+						{
+							for(int j = 0;j<Width;j++)
+							{
+								System.out.print(mazeContext[k][j]);
+							}
+							System.out.println();
+						}
+					Thread.sleep(100);
+					}
 				}
-				
-				if(calcuManhattonDistance(endNode.getX(),expandedNode.getX(),endNode.getY(),expandedNode.getY())<calcuManhattonDistance(endNode.getX(),currentNode.getX(),endNode.getY(),currentNode.getY()))
-				{
-					//insert current state
-					//insert successor state
-					break;
-				}
-				else
-				{
-					
-				}
-					
 			}
 		}
 		
 		return 0;
 	
 	}
-	public int calcuManhattonDistance(int x0,int x1, int y0, int y1)
+	public static int calcuManhattonDistance(int x0,int x1, int y0, int y1)
 	{
 		int distance = Math.abs(x1-x0) + Math.abs(y1-y0);
 		return distance;

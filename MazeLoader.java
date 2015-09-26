@@ -1,5 +1,10 @@
 import java.util.*;
+import java.awt.Color;
+import java.awt.Image;
 import java.io.*;
+
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 
 public class MazeLoader {
 	//initialize variables here
@@ -39,13 +44,19 @@ public class MazeLoader {
 	}
 	*/
 	//run the maze
-	public static void main(String [] args) throws IOException, InterruptedException
-	{
-		FileChooseingMethodChoosing();
-	}
-		
-		public static void FileChooseingMethodChoosing() throws IOException, InterruptedException
+	Image wall,
+	pacman,
+	walekdNode,
+	walkedPath,goal;
+
+	int count;
+	int size;
+		public char[][] FileChooseingMethodChoosing() throws IOException, InterruptedException
 		{
+			
+			
+			
+			
 			String fileName;
 			Scanner scanner = new Scanner(System.in);
 			System.out.println("enter the file name");
@@ -56,19 +67,47 @@ public class MazeLoader {
 			char [][] maze = null;
 			String line;
 			int x = 0;
-			int size = 0;
-			int count = 0;
+			size = 0;
+			count = 0;
 			while((line = buffer.readLine())!=null)
 			{
 		
 				count++;
 			}
 			fr.close();
+			FileReader fr2 = new FileReader(fileName);
+			BufferedReader bufferNew = new BufferedReader (fr2);
+			while((line = bufferNew.readLine())!=null)
+			{
+				
+				char [] vals = line.toCharArray();
+	            if (maze == null) {
+	                size = vals.length;
+	          //      System.out.println("total columns: "+size);
+	                maze = new char[count][size];
+	            }
+	  
+	            for (int col = 0; col < size; col++) {
+	      
+	                maze[x][col] = vals[col];
+	                System.out.print(maze[x][col]);
+	            }
+
+	            x++;
+	            System.out.println();
+			}
+			return maze;
 		//	System.out.println(count);
+			/*
 			while(true)
 			{
+			MazeMap mazeMap = new MazeMap(maze);
+			
+			Maze aMaze = new Maze(mazeMap);
+			
 			x=0;
 			maze=null;
+			System.out.println();
 			System.out.println("What method do you want to use? 1.Depth   2.Breath   3.Greedy   0.Exit   9.New File Path");
 			int methodChose = scanner.nextInt();
 			FileReader fr2 = new FileReader(fileName);
@@ -103,7 +142,7 @@ public class MazeLoader {
 			ArrayList<Node> solution = new ArrayList<Node>();
 			boolean [][] trace = new boolean[count][size];
 
-
+			
 			if(methodChose == 0)
 			{
 				System.exit(0);
@@ -242,34 +281,53 @@ public class MazeLoader {
 	if(mazeContext[x][y] == '.')
 	{
 		steps++;
-		System.out.println("Total steps: "+steps+"    Total Node Expanded: "+nodesE);
+		int leastNodeExpanded= backTrace(solution.get(solution.size()-1),mazeContext);
+		for(int k =0;k<height;k++)
+		{
+			for(int j = 0;j<width;j++)
+			{
+				System.out.print(mazeContext[k][j]);
+			}
+			System.out.println();
+		}
+		System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodesE);
 		return 1;
 	}
 	else
 	{
-		
-		if(mazeContext[x][y+1]=='.'||mazeContext[x][y+1]==' '&&walkedTrace[x][y+1]==false&&x>0&&y+1>0&&x<height-1&&y+1<width-1) //east
+		if(mazeContext[x][y-1]=='.'||mazeContext[x][y-1]==' '&&walkedTrace[x][y-1]==false&&x>0&&y-1>0&&x<height-1&&y-1<width-1) //east
 		{
-				steps++;
+			//	steps++;
 				nodesE++;
-				solution.add(new Node(x,y));
+				Node newNode = new Node(x,y);
+				if(!solution.isEmpty())
+				{
+				newNode.lastNode = solution.get(solution.size()-1);
+				}
+				solution.add(newNode);
 				walkedTrace[x][y] = true;
 				mazeContext[x][y] = 'O';
-				if(depthFirst(solution,mazeContext,x,y+1,walkedTrace,width,height,steps,nodesE)==1)
+				if(depthFirst(solution,mazeContext,x,y-1,walkedTrace,width,height,steps,nodesE)==1)
 				{
 					steps++;
-				//	System.out.println("Total steps: "+steps+"    Total Node Expanded: "+nodesE);
+
 					return 1;	
 				}
 				solution.remove(solution.size()-1); //unpaint
 				mazeContext[x][y] = ' ';
 				
 		}
+
 			if(mazeContext[x-1][y]=='.'||mazeContext[x-1][y]==' '&&walkedTrace[x-1][y]==false&&x-1>0&&y>0&&x-1<height-1&&y<width-1) //east
 			{
-					steps++;
+				//	steps++;
 					nodesE++;
-					solution.add(new Node(x,y));
+					Node newNode = new Node(x,y);
+					if(!solution.isEmpty())
+					{
+					newNode.lastNode = solution.get(solution.size()-1);
+					}
+					solution.add(newNode);
 					walkedTrace[x][y] = true;
 					mazeContext[x][y] = 'O';
 					if(depthFirst(solution,mazeContext,x-1,y,walkedTrace,width,height,steps,nodesE)==1)
@@ -282,17 +340,22 @@ public class MazeLoader {
 					mazeContext[x][y] = ' ';
 					
 			}
-			if(mazeContext[x][y-1]=='.'||mazeContext[x][y-1]==' '&&walkedTrace[x][y-1]==false&&x>0&&y-1>0&&x<height-1&&y-1<width-1) //east
+			if(mazeContext[x][y+1]=='.'||mazeContext[x][y+1]==' '&&walkedTrace[x][y+1]==false&&x>0&&y+1>0&&x<height-1&&y+1<width-1) //east
 			{
-					steps++;
+				//	steps++;
 					nodesE++;
-					solution.add(new Node(x,y));
+					Node newNode = new Node(x,y);
+					if(!solution.isEmpty())
+					{
+					newNode.lastNode = solution.get(solution.size()-1);
+					}
+					solution.add(newNode);
 					walkedTrace[x][y] = true;
 					mazeContext[x][y] = 'O';
-					if(depthFirst(solution,mazeContext,x,y-1,walkedTrace,width,height,steps,nodesE)==1)
+					if(depthFirst(solution,mazeContext,x,y+1,walkedTrace,width,height,steps,nodesE)==1)
 					{
 						steps++;
-				//		System.out.println("Total steps: "+steps+"    Total Node Expanded: "+nodesE);
+					//	System.out.println("Total steps: "+steps+"    Total Node Expanded: "+nodesE);
 						return 1;	
 					}
 					solution.remove(solution.size()-1); //unpaint
@@ -301,9 +364,15 @@ public class MazeLoader {
 			}
 			if(mazeContext[x+1][y]=='.'||mazeContext[x+1][y]==' '&&walkedTrace[x+1][y]==false&&x+1>0&&y>0&&x+1<height-1&&y<width-1) //east
 			{
-					steps++;
+					//steps++;
+					//nodesE++;
+					Node newNode = new Node(x,y);
 					nodesE++;
-					solution.add(new Node(x,y));
+					if(!solution.isEmpty())
+					{
+					newNode.lastNode = solution.get(solution.size()-1);
+					}
+					solution.add(newNode);
 					walkedTrace[x][y] = true;
 					mazeContext[x][y] = 'O';
 					if(depthFirst(solution,mazeContext,x+1,y,walkedTrace,width,height,steps,nodesE)==1)
@@ -342,12 +411,10 @@ public class MazeLoader {
 		{
 			//System.out.println("entered");
 			Node currentNode = mazeLocaQue.poll();
+			nodeExpanded++;
 			int currentX = currentNode.getX();
 			int currentY = currentNode.getY();
-			if(currentNode.lastNode!=null)
-			{
-				Node CurrentlastNode = currentNode.lastNode;
-			}
+		
 		//	System.out.println("currentX: "+currentX+" currentY: "+currentY+" Height: "+Height);
 			
 			if(currentX>0 && currentY+1>0 && currentX<Width-1 && currentY+1<Height-1)
@@ -355,18 +422,28 @@ public class MazeLoader {
 			//	System.out.println("entered1");
 				
 				Node theNewNode = new Node(currentX,currentY+1);
+				
 				numberOfSteps++;
 	
 				
 				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX][currentY+1] == ' '||mazeContext[currentX][currentY+1] == '.')
 				{
-					numberOfSteps++;
+				//	numberOfSteps++;
 					nodeExpanded++;
 					theNewNode.lastNode = currentNode;
 					if(mazeContext[currentX][currentY+1] == '.')
 					{
-						numberOfSteps++;
-						System.out.println("Number of steps: "+numberOfSteps+"    Node expanded: "+nodeExpanded);
+					//	numberOfSteps++;
+						int leastNodeExpanded= backTrace(theNewNode,mazeContext);
+						for(int k =0;k<Width;k++)
+						{
+							for(int j = 0;j<Height;j++)
+							{
+								System.out.print(mazeContext[k][j]);
+							}
+							System.out.println();
+						}
+						System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodeExpanded);
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
@@ -377,21 +454,23 @@ public class MazeLoader {
 				}
 				
 			}
+			/*
 			if(currentX-1>0 && currentY+1>0 && currentX-1<Width-1 && currentY+1<Height-1)
 			{
 			//	System.out.println("entered2");
 				Node theNewNode = new Node(currentX-1,currentY+1);
-				numberOfSteps++;
+
 
 				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX-1][currentY+1] == ' '||mazeContext[currentX-1][currentY+1] == '.')
 				{
 					nodeExpanded++;
-					numberOfSteps++;
+				//	numberOfSteps++;
 					theNewNode.lastNode = currentNode;
 					if(mazeContext[currentX-1][currentY+1] == '.')
 					{
-						numberOfSteps++;
-						System.out.println("Number of steps: "+numberOfSteps+"    Node expanded: "+nodeExpanded);
+						//numberOfSteps++;
+						int leastNodeExpanded= backTrace(theNewNode);
+						System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodeExpanded);
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
@@ -399,24 +478,34 @@ public class MazeLoader {
 					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'O';
 				}
 			}
+			*/
 			if(currentX-1>0 && currentY>0 && currentX-1<Width-1 && currentY<Height-1)
 			{
 			//	System.out.println("entered3");
 				Node theNewNode = new Node(currentX-1,currentY);
-				numberOfSteps++;
+
 				
 
 				theNewNode.lastNode = currentNode;
 				//System.out.println("the NEW node X: "+theNewNode.getX()+" newY: "+theNewNode.getY());
 				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX-1][currentY] == ' ' || mazeContext[currentX-1][currentY]== '.')
 				{
-					numberOfSteps++;
+				//	numberOfSteps++;
 					nodeExpanded++;
 				//	System.out.println("RightTrack!");
 					if(mazeContext[currentX-1][currentY] == '.')
 					{
 						numberOfSteps++;
-						System.out.println("Number of steps: "+numberOfSteps+"    Node expanded: "+nodeExpanded);
+						int leastNodeExpanded= backTrace(theNewNode,mazeContext);
+						for(int k =0;k<Width;k++)
+						{
+							for(int j = 0;j<Height;j++)
+							{
+								System.out.print(mazeContext[k][j]);
+							}
+							System.out.println();
+						}
+						System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodeExpanded);
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
@@ -424,21 +513,24 @@ public class MazeLoader {
 					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'O';
 				}
 			}
+			/*
 			if(currentX-1>0 && currentY-1>0 && currentX-1<Width-1 && currentY-1<Height-1)
 			{
 		//		System.out.println("entered4");
 				Node theNewNode = new Node(currentX-1,currentY-1);
-				numberOfSteps++;
+				//nodeExpanded++;
+				//numberOfSteps++;
 				
 				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX-1][currentY-1] == ' '||mazeContext[currentX-1][currentY-1]== '.')
 				{
 					nodeExpanded++;
-					numberOfSteps++;
+				//	numberOfSteps++;
 					theNewNode.lastNode = currentNode;
 					if(mazeContext[currentX-1][currentY-1] == '.')
 					{
 						numberOfSteps++;
-						System.out.println("Number of steps: "+numberOfSteps+"    Node expanded: "+nodeExpanded);
+						int leastNodeExpanded= backTrace(theNewNode);
+						System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodeExpanded);
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
@@ -446,24 +538,34 @@ public class MazeLoader {
 					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'O';
 				}
 			}
+			*/
 			if(currentX>0 && currentY-1>0 && currentX<Width-1 && currentY-1<Height-1)
 			{
 			//	System.out.println("entered5");
 				Node theNewNode = new Node(currentX,currentY-1);
-				numberOfSteps++;
+
 
 			//	System.out.println("the NEW node X: "+theNewNode.getX()+" newY: "+theNewNode.getY());
 			
 				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX][currentY-1] == ' '||mazeContext[currentX][currentY-1]== '.')
 				{
 				//	System.out.println("RightTrack!");
-					numberOfSteps++;
+				//	numberOfSteps++;
 					nodeExpanded++;
 					theNewNode.lastNode = currentNode;
 					if(mazeContext[currentX][currentY-1] == '.')
 					{
 						numberOfSteps++;
-						System.out.println("Number of steps: "+numberOfSteps+"    Node expanded: "+nodeExpanded);
+						int leastNodeExpanded= backTrace(theNewNode,mazeContext);
+						for(int k =0;k<Width;k++)
+						{
+							for(int j = 0;j<Height;j++)
+							{
+								System.out.print(mazeContext[k][j]);
+							}
+							System.out.println();
+						}
+						System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodeExpanded);
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
@@ -471,21 +573,23 @@ public class MazeLoader {
 					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'O';
 				}
 			}
+			/*
 			if(currentX+1>0 && currentY-1>0 && currentX+1<Width-1 && currentY-1<Height-1)
 			{
 		//		System.out.println("entered6");
 				Node theNewNode = new Node(currentX+1,currentY-1);
-				numberOfSteps++;
+
 
 				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX+1][currentY-1] == ' ' || mazeContext[currentX+1][currentY-1]== '.')
 				{
-					numberOfSteps++;
+					//numberOfSteps++;
 					nodeExpanded++;
 					theNewNode.lastNode = currentNode;
 					if(mazeContext[currentX+1][currentY-1] == '.')
 					{
 						numberOfSteps++;
-						System.out.println("Number of steps: "+numberOfSteps+"    Node expanded: "+nodeExpanded);
+						int leastNodeExpanded= backTrace(theNewNode);
+						System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodeExpanded);
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
@@ -494,21 +598,31 @@ public class MazeLoader {
 				}
 				
 			}
+			*/
 			if(currentX+1>0 && currentY>0 && currentX+1<Width-1 && currentY<Height-1)
 			{
 			//	System.out.println("entered7");
 				Node theNewNode = new Node(currentX+1,currentY);
-				numberOfSteps++;
+
 
 				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX+1][currentY] == ' '||mazeContext[currentX+1][currentY]== '.')
 				{
-					numberOfSteps++;
+					//numberOfSteps++;
 					nodeExpanded++;
 					theNewNode.lastNode = currentNode;
 					if(mazeContext[currentX+1][currentY] == '.')
 					{
 						numberOfSteps++;
-						System.out.println("Number of steps: "+numberOfSteps+"    Node expanded: "+nodeExpanded);
+						int leastNodeExpanded= backTrace(theNewNode,mazeContext);
+						for(int k =0;k<Width;k++)
+						{
+							for(int j = 0;j<Height;j++)
+							{
+								System.out.print(mazeContext[k][j]);
+							}
+							System.out.println();
+						}
+						System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodeExpanded);
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
@@ -516,22 +630,26 @@ public class MazeLoader {
 					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'O';
 				}
 			}
+			/*
 			if(currentX+1>0 && currentY+1>0 && currentX+1<Width-1 && currentY+1<Height-1)
 			{
 			//	System.out.println("entered8");
 				Node theNewNode = new Node(currentX+1,currentY+1);
-				numberOfSteps++;
+				
+				//numberOfSteps++;
 				
 
 				if(isChecked.indexOf(theNewNode.getX()+"/"+theNewNode.getY())<0 && mazeContext[currentX+1][currentY+1] == ' '||mazeContext[currentX+1][currentY+1]== '.')
 				{
+					
+					//numberOfSteps++;
 					nodeExpanded++;
-					numberOfSteps++;
 					theNewNode.lastNode = currentNode;
 					if(mazeContext[currentX+1][currentY+1] == '.')
 					{
 						numberOfSteps++;
-						System.out.println("Number of steps: "+numberOfSteps+"    Node expanded: "+nodeExpanded);
+						int leastNodeExpanded= backTrace(theNewNode);
+						System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodeExpanded);
 						return 1;
 					}
 					mazeLocaQue.add(theNewNode);
@@ -539,6 +657,7 @@ public class MazeLoader {
 					mazeContext[theNewNode.getX()][theNewNode.getY()] = 'O';
 				}
 			}
+			*/
 			for(int k =0;k<Width;k++)
 			{
 				for(int j = 0;j<Height;j++)
@@ -559,81 +678,102 @@ public class MazeLoader {
 	{
 		int numberOfSteps = 0;
 		int nodeExpanded = 0;
-		//System.out.println(Height);
-	//	System.out.println("endNode: "+endNode.getX()+ "   "+endNode.getY()+ "    width: "+Width+"    height: "+Height);
-		//Thread.sleep(100);
 		//Open state
 		PriorityQueue<Node> mazeLocaQue = new PriorityQueue<Node>();
-		
 		//checked state
 		List<String> isChecked = new ArrayList<String>();
+		newNode.setH(calcuManhattonDistance(endNode.getX(),newNode.getX(),endNode.getY(),newNode.getY()));
 		mazeLocaQue.add(newNode);
-		int [] xM = {0,0,-1,-1,-1,1,1,1};
-		int [] yM = {-1,1,-1,0,1,-1,0,1};
+		int [] xM = {0,0,-1,1};
+		int [] yM = {-1,1,0,0};
 		numberOfSteps++;
 		while(!mazeLocaQue.isEmpty())
 		{
-		
-			Node currentNode = mazeLocaQue.poll();
-	//		System.out.println(currentNode.getH());
+	//		System.out.println("The value!:    "+mazeLocaQue.peek().getH());
 		//	Thread.sleep(500);
+			Node currentNode = mazeLocaQue.poll();
 			isChecked.add(currentNode.getX()+"/"+currentNode.getY());
 			numberOfSteps++;
 			if(mazeContext[currentNode.getX()][currentNode.getY()] == '.')
 			{
 				numberOfSteps++;
+				int leastNodeExpanded = backTrace(currentNode,mazeContext);
+				for(int k =0;k<Width;k++)
+				{
+					for(int j = 0;j<Height;j++)
+					{
+						System.out.print(mazeContext[k][j]);
+					}
+					System.out.println();
+				}
+				System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodeExpanded);
 				return 1;
 			}else
 			{
 				numberOfSteps++;
-			//int h = calcuManhattonDistance(endNode.getX(),currentNode.getX(),endNode.getY(),currentNode.getY());
 			//starting counter
 			//applicable actions
-				for(int i = 0;i<8;i++ )//not finished.  > starting counter
+				for(int i = 0;i<4;i++ )//not finished.  > starting counter
 				{
 					numberOfSteps++;
-			//		System.out.println("Entered loop!!!!!");
 					int newX = currentNode.getX()+xM[i];
 					int newY = currentNode.getY()+yM[i];
-					//System.out.println("dx   "+xM[i]+"   dy  "+yM[i]+"   Current X   "+currentNode.getX()+  "currentY  "+currentNode.getY());
-					//System.out.println("CurrentPosition: "+newX+"   "+newY);
-					//System.out.println("The Value: "+ mazeContext[currentNode.getX()+xM[i]][currentNode.getY()+yM[i]]);
 					if(mazeContext[newX][newY] == '.')
 					{
 						numberOfSteps++;
-						System.out.println("Total steps: "+numberOfSteps+"    Total Node Expanded: "+nodeExpanded);
+						int leastNodeExpanded = backTrace(currentNode,mazeContext);
+						for(int k =0;k<Height;k++)
+						{
+							for(int j = 0;j<Width;j++)
+							{
+								System.out.print(mazeContext[k][j]);
+							}
+							System.out.println();
+						}
+						Thread.sleep(70);
+						System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodeExpanded);
 						return 1;
 					}
-				//	Thread.sleep(200);
 					if(mazeContext[newX][newY] == ' ' ||mazeContext[newX][newY] == '.' && newX>0 && newY>0 && newX<Width-1 && newY<Height-1)
-					{
-			//			System.out.println("right track");
-				//		System.out.println("dx   "+xM[i]+"   dy  "+yM[i]+"   Current X   "+currentNode.getX()+  "currentY  "+currentNode.getY());
-			
-						
+					{				
 				//current_action = applicable action
 				//successor state= currentstate apply
-						
 						Node expandedNode = new Node(newX,newY);
-						numberOfSteps++;
+						
+						//numberOfSteps++;
 						nodeExpanded++;
 						if(mazeContext[expandedNode.getX()][expandedNode.getY()] == '.')
 						{
-							numberOfSteps++;
-							System.out.println("Total steps: "+numberOfSteps+"    Total Node Expanded: "+nodeExpanded);
+							//numberOfSteps++;
+							expandedNode.lastNode = currentNode;
+							int leastNodeExpanded = backTrace(expandedNode,mazeContext);
+							for(int k =0;k<Width;k++)
+							{
+								for(int j = 0;j<Height;j++)
+								{
+									System.out.print(mazeContext[k][j]);
+								}
+								System.out.println();
+							}
+							Thread.sleep(70);
+							System.out.println("Total steps: "+leastNodeExpanded+"    Total Node Expanded: "+nodeExpanded);
 							return 1;
 						}
 				//end if
 						expandedNode.setH(calcuManhattonDistance(endNode.getX(),expandedNode.getX(),endNode.getY(),expandedNode.getY()));
+
 						numberOfSteps++;
 						if(isChecked.indexOf(expandedNode.getX()+"/"+expandedNode.getY())<0)
 						{
-							numberOfSteps++;
+							//numberOfSteps++;
 							expandedNode.lastNode = currentNode;
 							mazeLocaQue.add(expandedNode);//insert current state
+					//		if(mazeLocaQue.peek()!=null)
+					//		{
+					//		System.out.println("expande H:    "+mazeLocaQue.peek().getH());
+					//		}
 							isChecked.add(expandedNode.getX()+"/"+expandedNode.getY());//insert successor state
 							mazeContext[expandedNode.getX()][expandedNode.getY()] = 'O';
-							
 						}
 						for(int k =0;k<Height;k++)
 						{	
@@ -648,10 +788,24 @@ public class MazeLoader {
 				}
 			}
 		}
-		
 		return 0;
-	
 	}
+	//backtrace get the least node
+	public static int backTrace(Node walkedNode,char [][] mazeContext)
+	{
+		int leastSteps = 1;
+		while(walkedNode.lastNode!=null)
+		{
+			leastSteps++;
+			mazeContext[walkedNode.getX()][walkedNode.getY()] = '.';
+			walkedNode = walkedNode.lastNode;
+			//System.out.println("X: "+walkedNode.getX()+"   Y: "+walkedNode.getY());
+		}
+		
+		return leastSteps;
+	}
+	
+	//Calculating heuristic
 	public static int calcuManhattonDistance(int x0,int x1, int y0, int y1)
 	{
 		int distance = Math.abs(x1-x0) + Math.abs(y1-y0);

@@ -4,19 +4,12 @@ public class Node implements Comparable<Node> {
 	private int nodeY;
 	Node lastNode;
 	private int heu;
-	private int cost;
-	public Node(){
-		cost = 0;
+	public Node(int xX,int yY)
+	{
+		nodeX = xX;
+		nodeY = yY;
 	}
-	public Node(int x, int y, int c, Node parent){
-		nodeX = x;
-		nodeY = y;
-		cost = c;
-		lastNode = parent;
-	}
-	public int getCost(){
-		return cost;
-	}
+	
 	public int getX()
 	{
 		return nodeX;
@@ -57,4 +50,5 @@ public class Node implements Comparable<Node> {
 
          return 0;
      }
+
 }

@@ -28,6 +28,8 @@ public class MazeMap extends JPanel implements ActionListener {
 	public MazeMap() throws IOException
 	{
 		m = new Map();
+		m.print();
+		System.out.println("aasdasdsa");
 		Height = m.count;
 		Width = m.size;
 		theMaze = m.getMap();
@@ -37,14 +39,8 @@ public class MazeMap extends JPanel implements ActionListener {
 	public void paint(Graphics g)
 	{
 		super.paint(g);
-		for(int k =0;k<Width;k++)
-		{
-			for(int j = 0;j<Height;j++)
-			{
-				System.out.print(theMaze[k][j]);
-			}
-			System.out.println();
-		}
+
+		
 		for(int i = 0; i<Height;i++)
 		{
 			for(int j = 0; j<Width;j++)

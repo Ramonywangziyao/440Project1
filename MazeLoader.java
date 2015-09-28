@@ -11,11 +11,12 @@ public class MazeLoader {
 	
 	
 		boolean [][] trace;
-	
+		/*
 		public static void main(String[]args) throws IOException, InterruptedException
 		{
 			FileChooseingMethodChoosing();
 		}
+		*/
 		public static char[][] FileChooseingMethodChoosing() throws IOException, InterruptedException
 		{
 			String fileName;
@@ -699,10 +700,7 @@ public class MazeLoader {
 		return resultList;
 	}
 
-	public static int directionCostCase1(char dir1, char dir2){
-		if(dir1==dir2) return 2;
-		return 1;
-	}
+
 	
 	//1.2 in manhatton, there are 2 cases. 2 different cost. in our heuristic, it is only one
 	public static int aStarTurnCostManhatton(char[][] mazeContext,Node startNode,final Node endNode,int caseChoosing){

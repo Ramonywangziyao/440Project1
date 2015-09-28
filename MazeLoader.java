@@ -111,7 +111,7 @@ public class MazeLoader {
 		//trace = new boolean[maze.Height][maze.Width];  
 		//if ()select which method to use
 		
-		aStar(maze,startNode,endNode);
+		aStarTurnCost(maze,startNode,endNode);
 		
 		
 	}
@@ -606,16 +606,73 @@ public class MazeLoader {
 	
 	public static ArrayList<DirectedNode> extractNodeTurnCost(char[][]mazeContext, DirectedNode node){
 		ArrayList<DirectedNode> resultList = new ArrayList<>();
-		if (mazeContext[node.getX()+1][node.getY()]==' ') resultList.add(new DirectedNode(node.getX()+1,node.getY(),node.getCost()+directionCostCase1('e',node.getDirection()),node,'e'));
-		if (mazeContext[node.getX()-1][node.getY()]==' ') resultList.add(new DirectedNode(node.getX()-1,node.getY(),node.getCost()+directionCostCase1('w',node.getDirection()),node,'w'));
-		if (mazeContext[node.getX()][node.getY()+1]==' ') resultList.add(new DirectedNode(node.getX(),node.getY()+1,node.getCost()+directionCostCase1('s',node.getDirection()),node,'s'));
-		if (mazeContext[node.getX()][node.getY()-1]==' ') resultList.add(new DirectedNode(node.getX(),node.getY()-1,node.getCost()+directionCostCase1('n',node.getDirection()),node,'n'));
+		if (mazeContext[node.getX()+1][node.getY()]==' ') resultList.add(new DirectedNode(node.getX()+1,node.getY(),node.getCost()+directionDiff('s',node.getDirection())*2+1,node,'s',node.getTurns()+directionDiff('s',node.getDirection())));
+		if (mazeContext[node.getX()-1][node.getY()]==' ') resultList.add(new DirectedNode(node.getX()-1,node.getY(),node.getCost()+directionDiff('n',node.getDirection())*2+1,node,'n',node.getTurns()+directionDiff('n',node.getDirection())));
+		if (mazeContext[node.getX()][node.getY()+1]==' ') resultList.add(new DirectedNode(node.getX(),node.getY()+1,node.getCost()+directionDiff('e',node.getDirection())*2+1,node,'e',node.getTurns()+directionDiff('e',node.getDirection())));
+		if (mazeContext[node.getX()][node.getY()-1]==' ') resultList.add(new DirectedNode(node.getX(),node.getY()-1,node.getCost()+directionDiff('w',node.getDirection())*2+1,node,'w',node.getTurns()+directionDiff('w',node.getDirection())));
 		return resultList;
 	}
 	
-	public static int directionCostCase1(char dir1, char dir2){
-		if(dir1==dir2) return 2;
-		return 1;
+	public static int turnHeuristic(DirectedNode node, int gx, int gy,int forwardcost,int turncost){
+
+		int turnsChange = node.getTurns()-node.lastNode.getTurns();
+		return calcuManhattonDistance(node.getX(),gx,node.getY(),gy)*forwardcost+turnsChange*turncost;
+		
+//		return node.getTurns();
+	}
+	
+	public static void aStarTurnCost(char[][] mazeContext,Node startNode,final Node endNode){
+		DirectedNode startNodedir = new DirectedNode(startNode.getX(),startNode.getY());
+		
+		
+		ArrayList<DirectedNode> iniList = extractNodeTurnCost(mazeContext,startNodedir);
+		Comparator<DirectedNode> nodeCom = new Comparator<DirectedNode>() {
+			public int compare(DirectedNode node1, DirectedNode node2) {
+//				if(node1.getCost()+turnHeuristic(node1,endNode.getX(),endNode.getY(),1,2)<node2.getCost()+turnHeuristic(node2,endNode.getX(),endNode.getY(),1,2)) return -1;
+//				else if(node1.getCost()+turnHeuristic(node1,endNode.getX(),endNode.getY(),1,2)>node2.getCost()+turnHeuristic(node2,endNode.getX(),endNode.getY(),1,2)) return 1;
+				if(node1.getCost()+calcuManhattonDistance(node1.getX(),endNode.getX(),node1.getY(),endNode.getY())<node2.getCost()+calcuManhattonDistance(node2.getX(),endNode.getX(),node2.getY(),endNode.getY())) return -1;
+				else if(node1.getCost()+calcuManhattonDistance(node1.getX(),endNode.getX(),node1.getY(),endNode.getY())>node2.getCost()+calcuManhattonDistance(node2.getX(),endNode.getX(),node2.getY(),endNode.getY())) return 1;
+				//else if(node1.getCost()<node2.getCost()) return -1;
+				//else if(node1.getCost()>node2.getCost() return 1;
+				return 0;
+			}
+		};
+		PriorityQueue<DirectedNode> mazeLocaQue = new PriorityQueue<DirectedNode>(iniList.size(),nodeCom);
+		for(DirectedNode node:iniList)
+			mazeLocaQue.offer(node);
+		DirectedNode result = mazeLocaQue.poll();
+		while(calcuManhattonDistance(result.getX(),endNode.getX(),result.getY(),endNode.getY())>1){
+			mazeContext[result.getX()][result.getY()] = '.';
+			System.out.println((result.getX()+1)+" "+(result.getY()+1));
+			/*
+			for(int k =0;k<mazeContext.length;k++) {
+				for(int j = 0;j<mazeContext[k].length;j++){
+					System.out.print(mazeContext[k][j]);
+				}
+				System.out.println();
+			}
+			*/
+			//Thread.sleep(200);
+			ArrayList<DirectedNode> cnodes = extractNodeTurnCost(mazeContext,result);
+			for(DirectedNode node:cnodes)
+				mazeLocaQue.offer(node);
+			result = mazeLocaQue.poll();
+		}
+		mazeContext[result.getX()][result.getY()] = '.';
+		System.out.println((result.getX()+1)+" "+(result.getY()+1));
+		
+		for(int k =0;k<mazeContext.length;k++) {
+			for(int j = 0;j<mazeContext[k].length;j++){
+				System.out.print(mazeContext[k][j]);
+			}
+			System.out.println();
+		}
+		
+		System.out.println(result.getX()+","+(result.lastNode.getY()+1)+","+result.lastNode.getDirection()+","+result.getCost());
+		while(result.lastNode != null){
+			System.out.println((result.lastNode.getX()+1)+","+(result.lastNode.getY()+1)+","+result.lastNode.getDirection());
+			result = result.lastNode;
+		}
 	}
 	
 	public static void aStarwGhost(char[][] mazeContext,Node startNode,final Node endNode) throws InterruptedException{
@@ -731,6 +788,20 @@ public class MazeLoader {
 	
 	public static void clearScreen(){
 		for(int i=0;i<100;i++) System.out.println();
+	}
+	
+	public static int directionDiff(char d1,char d2){
+		final char[] direction = {'n','e','s','w'};
+		int d1pos = 0;
+		int d2pos = 0;
+		for (int i=0;i<direction.length;i++){
+			if (d1==direction[i]) d1pos = i;
+			if (d2==direction[i]) d2pos = i;
+		}
+		int difference = Math.abs(d1pos-d2pos);
+		if (difference==2) return 2;
+		else if (difference==0) return 0;
+		return 1;
 	}
 	
 }

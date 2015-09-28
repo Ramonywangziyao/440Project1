@@ -39,6 +39,20 @@ public class Map {
 	{
 		return maze;
 	}
+	public void print()
+	{
+		for(int k =0;k<count;k++)
+		{	
+			for(int j = 0;j<size;j++)
+			{
+				System.out.print(maze[k][j]);
+			}
+			System.out.println();
+		}
+
+	}
+
+
 	public void openFile()
 	{
 		try{
@@ -67,12 +81,13 @@ public class Map {
 	
 			count++;
 		}
+		System.out.println(count);
 		fr.close();
 		FileReader fr2 = new FileReader(fileName);
 		BufferedReader bufferNew = new BufferedReader (fr2);
 		while((line = bufferNew.readLine())!=null)
 		{
-			
+			System.out.println("Entered!");
 			char [] vals = line.toCharArray();
             if (maze == null) {
                 size = vals.length;
@@ -81,7 +96,7 @@ public class Map {
             }
   
             for (int col = 0; col < size; col++) {
-      
+            	
                 maze[x][col] = vals[col];
                 System.out.print(maze[x][col]);
             }

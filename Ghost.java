@@ -17,4 +17,7 @@ public class Ghost {
 		}
 		return ghostPath.get(position);
 	}
+	public ArrayList<int[]> getGhostPath(){
+		return ghostPath;
+	}
 }

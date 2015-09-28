@@ -6,11 +6,6 @@ import javax.swing.JFrame;
 
 public class Maze {
 
-	public static void main(String [] args) throws IOException, InterruptedException
-	{
-		
-		new Maze();
-	}
 
 	public Maze() throws IOException {
 		// TODO Auto-generated constructor stub
